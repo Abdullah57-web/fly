@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Settings · Fly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/profile.css" />
+  </head>
+  <body>
+    <div class="page">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">F</span>
+          <span class="brand-name">Fly</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item">Dashboard</a>
+          <a href="#" class="nav-item active">Profile</a>
+          <a href="#" class="nav-item">Security</a>
+          <a href="#" class="nav-item">Notifications</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Account</p>
+            <h1>Profile settings</h1>
+            <p class="subtitle">Update your personal details and preferences.</p>
+          </div>
+        </header>
+
+        <div id="alert" class="alert hidden" role="status" aria-live="polite"></div>
+
+        <form id="profile-form" class="profile-form" novalidate>
+          <section class="card">
+            <div class="card-header">
+              <h2>Personal information</h2>
+              <p>Basic details that appear on your profile.</p>
+            </div>
+
+            <div class="avatar-row">
+              <div class="avatar" id="avatar-preview" aria-hidden="true">A</div>
+              <div>
+                <p class="avatar-label">Profile photo</p>
+                <p class="avatar-hint">Your initials are shown until you upload a photo.</p>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="firstName">First name <span class="required">*</span></label>
+                <input type="text" id="firstName" name="firstName" autocomplete="given-name" required />
+                <span class="error" data-error-for="firstName"></span>
+              </div>
+
+              <div class="field">
+                <label for="lastName">Last name</label>
+                <input type="text" id="lastName" name="lastName" autocomplete="family-name" />
+              </div>
+
+              <div class="field">
+                <label for="username">Username <span class="required">*</span></label>
+                <div class="input-prefix">
+                  <span>@</span>
+                  <input type="text" id="username" name="username" autocomplete="username" required />
+                </div>
+                <span class="error" data-error-for="username"></span>
+              </div>
+
+              <div class="field">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" name="email" autocomplete="email" required />
+                <span class="error" data-error-for="email"></span>
+              </div>
+
+              <div class="field field-full">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="4" maxlength="280" placeholder="Tell us a little about yourself"></textarea>
+                <div class="field-meta">
+                  <span class="hint">Max 280 characters</span>
+                  <span id="bio-count">0 / 280</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <h2>Contact & location</h2>
+              <p>How people can reach you.</p>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+92 300 1234567" />
+              </div>
+
+              <div class="field">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" autocomplete="address-level2" placeholder="Karachi, Pakistan" />
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <h2>Preferences</h2>
+              <p>Language, timezone, and notification settings.</p>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="timezone">Timezone</label>
+                <select id="timezone" name="timezone">
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">Eastern Time (US)</option>
+                  <option value="Europe/London">London</option>
+                  <option value="Asia/Dubai">Dubai</option>
+                  <option value="Asia/Karachi">Karachi</option>
+                  <option value="Asia/Tokyo">Tokyo</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="language">Language</label>
+                <select id="language" name="language">
+                  <option value="en">English</option>
+                  <option value="ur">Urdu</option>
+                  <option value="ar">Arabic</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="toggle-list">
+              <label class="toggle">
+                <input type="checkbox" id="emailNotifications" name="emailNotifications" />
+                <span class="toggle-ui"></span>
+                <span class="toggle-copy">
+                  <strong>Email notifications</strong>
+                  <small>Receive updates about account activity.</small>
+                </span>
+              </label>
+
+              <label class="toggle">
+                <input type="checkbox" id="pushNotifications" name="pushNotifications" />
+                <span class="toggle-ui"></span>
+                <span class="toggle-copy">
+                  <strong>Push notifications</strong>
+                  <small>Get alerts on this device.</small>
+                </span>
+              </label>
+            </div>
+          </section>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
+            <button type="submit" class="btn btn-primary" id="save-btn">Save changes</button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script src="/js/profile.js"></script>
+  </body>
+</html>
