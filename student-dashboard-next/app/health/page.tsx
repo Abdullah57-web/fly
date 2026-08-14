@@ -1,0 +1,1 @@
+﻿export default function HealthPage() { return ( <div className="p-8 max-w-md mx-auto mt-10 bg-green-50 border border-green-300 rounded-lg text-center"> <h1 className="text-xl font-bold text-green-700">System Status: Operational</h1> <p className="text-gray-600 mt-2">Next.js framework connection is running flawlessly.</p> </div> ); }
