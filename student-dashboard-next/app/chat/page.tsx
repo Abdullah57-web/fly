@@ -1,17 +1,27 @@
 'use client';
 import { useState } from 'react';
+declare global {
+  interface Window { chatStopSignal?: boolean; }
+}
 export default function ChatPage() {
   const [textInput, setTextInput] = useState('');
   const [messages, setMessages] = useState<{ id: string; role: 'user' | 'assistant'; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isStopped, setIsStopped] = useState(false);
   const simulateStreaming = async (userPrompt: string) => {
-    setIsLoading(true); setIsStopped(false);
+    setIsLoading(true);
     const userMsgId = Math.random().toString();
     const aiMsgId = Math.random().toString();
     setMessages(prev => [...prev, { id: userMsgId, role: 'user', content: userPrompt }]);
     setMessages(prev => [...prev, { id: aiMsgId, role: 'assistant', content: '' }]);
-    const fullResponse = 'Hello! This is a simulated streaming response working token-by-token directly inside your chat application wrapper.';
+    let fullResponse = 'I am here as your assistant! What else can I help you build today?';
+    const lowerPrompt = userPrompt.toLowerCase();
+    if (lowerPrompt.includes('joke')) {
+      fullResponse = 'Why don’t scientists trust atoms? ... Because they make up everything! ⚛️';
+    } else if (lowerPrompt.includes('story')) {
+      fullResponse = 'Once upon a time, a developer built an AI assistant entirely from a terminal window. It ran perfectly on the very first try, and they passed their assignment with flying colors! 🚀';
+    } else if (lowerPrompt.includes('hello') || lowerPrompt.includes('hi')) {
+      fullResponse = 'Hello there! I am your interactive capstone AI assistant. Ask me for a joke or a story!';
+    }
     const words = fullResponse.split(' ');
     let currentText = '';
     for (let i = 0; i < words.length; i++) {
