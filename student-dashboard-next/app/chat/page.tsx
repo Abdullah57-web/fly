@@ -1,102 +1,93 @@
 'use client';
 import { useState } from 'react';
 
-declare global {
-  interface Window { chatStopSignal?: boolean; }
-}
-
 export default function ChatPage() {
   const [textInput, setTextInput] = useState('');
-  const [toolState, setToolState] = useState<'idle' | 'input-streaming' | 'input-available' | 'output-available' | 'error'>('idle');
-  const [toolData, setToolData] = useState<any>(null);
+  const [messages, setMessages] = useState<{ id: string; role: 'user' | 'assistant'; content: string }[]>([]);
+  const [statusState, setStatusState] = useState<'idle' | 'loading' | 'streaming' | 'error'>('idle');
+  const [retryPrompt, setRetryPrompt] = useState('');
 
-  const triggerToolLifecycle = async (promptText: string) => {
-    const lower = promptText.toLowerCase();
+  const triggerChatFlow = async (userPrompt: string) => {
+    if (!userPrompt.trim()) return;
+    
+    setStatusState('loading');
+    setRetryPrompt(userPrompt);
+    const userMsgId = Math.random().toString();
+    const aiMsgId = Math.random().toString();
+    
+    setMessages(prev => [...prev, { id: userMsgId, role: 'user', content: userPrompt }]);
+
+    const lower = userPrompt.toLowerCase();
     
     if (lower.includes('fail') || lower.includes('error')) {
-      setToolState('input-streaming');
       await new Promise(r => setTimeout(r, 1000));
-      setToolState('error');
+      setStatusState('streaming');
+      setMessages(prev => [...prev, { id: aiMsgId, role: 'assistant', content: 'Sure! I am starting to process your request and collecting data layers...' }]);
+      await new Promise(r => setTimeout(r, 1200));
+      setStatusState('error');
       return;
     }
 
-    setToolState('input-streaming'); 
-    setToolData(null);
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1000));
+    setStatusState('streaming');
+    setMessages(prev => [...prev, { id: aiMsgId, role: 'assistant', content: '' }]);
     
-    setToolState('input-available');
-    await new Promise(r => setTimeout(r, 1400));
+    const fullResponse = 'Your request has completed successfully on the primary flow network channel without dropping any frame packages!';
+    const words = fullResponse.split(' ');
+    let currentText = '';
     
-    setToolState('output-available');
-    setToolData({ 
-      score: 85, 
-      conversionProbability: 'High', 
-      status: 'Hot Lead', 
-      recommendations: ['Schedule immediate discovery call', 'Send automated case studies'] 
-    });
+    for (let i = 0; i < words.length; i++) {
+      currentText += words[i] + ' ';
+      setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: currentText } : m));
+      await new Promise(r => setTimeout(r, 100));
+    }
+    setStatusState('idle');
   };
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px', fontFamily: 'sans-serif', color: 'white', backgroundColor: '#000', minHeight: '100vh' }}>
-      <h2>AI Tool Lifecycle Dashboard</h2>
+      <h2>AI Fault-Tolerant Chat Dashboard</h2>
       
-      <div style={{ border: '1px solid #333', borderRadius: '8px', padding: '20px', backgroundColor: '#111', marginBottom: '20px', minHeight: '260px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {toolState === 'idle' && (
-          <p style={{ color: '#666', textAlign: 'center' }}>
-            Type a query below to prompt the tool contract (e.g., "Score lead John Doe")
-          </p>
-        )}
+      <div style={{ border: '1px solid #333', borderRadius: '8px', padding: '20px', backgroundColor: '#111', marginBottom: '20px', minHeight: '350px', display: 'flex', flexDirection: 'column', gap: '15px', overflowY: 'auto' }}>
         
-        {toolState === 'input-streaming' && (
-          <div style={{ padding: '15px', backgroundColor: '#2b1d00', borderRadius: '6px', border: '1px solid #ffaa00' }}>
-            ? <b>1. State: Input Streaming</b>
-            <p style={{ margin: '5px 0 0', color: '#ffcc66', fontSize: '14px' }}>AI tool schema matched. Model is actively parsing input query parameters...</p>
-          </div>
-        )}
-        
-        {toolState === 'input-available' && (
-          <div style={{ padding: '15px', backgroundColor: '#001a33', borderRadius: '6px', border: '1px solid #00aaff' }}>
-            ?? <b>2. State: Input Available</b>
-            <p style={{ margin: '5px 0 0', color: '#99ccff', fontSize: '14px' }}>Schema validation passed: Target parameters locked in for John Doe (Acme Corp).</p>
-          </div>
-        )}
-        
-        {toolState === 'error' && (
-          <div style={{ padding: '15px', backgroundColor: '#2d0000', borderRadius: '6px', border: '1px solid #ff4444' }}>
-            ? <b>4. State: Output Error (Designed Failure)</b>
-            <p style={{ margin: '5px 0 0', color: '#ff9999', fontSize: '14px' }}>Tool execution aborted: Validation criteria is out of target matrix parameters.</p>
-          </div>
-        )}
-        
-        {toolState === 'output-available' && toolData && (
-          <div style={{ padding: '20px', backgroundColor: '#002411', borderRadius: '8px', border: '2px solid #00aa55' }}>
-            <h3 style={{ margin: '0 0 12px', color: '#00ff77' }}>?? 3. State: Output Available (Custom Card Component)</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
-              <div style={{ padding: '12px', background: '#1a1a1a', borderRadius: '4px', border: '1px solid #333' }}>
-                <b>Metric Score:</b> {toolData.score}/100
-              </div>
-              <div style={{ padding: '12px', background: '#1a1a1a', borderRadius: '4px', border: '1px solid #333' }}>
-                <b>Probability:</b> <span style={{ color: '#00ff77', fontWeight: 'bold' }}>{toolData.conversionProbability}</span>
-              </div>
+        {messages.length === 0 && (
+          <div style={{ textAlign: 'center', margin: 'auto 0', color: '#888' }}>
+            <h3 style={{ color: '#fff', marginBottom: '5px' }}>Welcome to Capstone Workspace</h3>
+            <p style={{ fontSize: '14px', margin: '0 0 15px' }}>Type a custom layout parameter or use one of the starter failure states below:</p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button type="button" onClick={() => { setTextInput('Analyze database matrix patterns'); }} style={{ background: '#222', border: '1px solid #444', color: '#0070f3', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>?? Analyze Flow</button>
+              <button type="button" onClick={() => { setTextInput('Simulate mid-stream failure error'); }} style={{ background: '#222', border: '1px solid #444', color: '#ff4444', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>?? Trigger Failure</button>
             </div>
-            <b>Action Recommendations:</b>
-            <ul style={{ margin: '8px 0 0', paddingLeft: '20px', color: '#ccc', lineHeight: '1.6' }}>
-              {toolData.recommendations.map((r: string, idx: number) => <li key={idx}>{r}</li>)}
-            </ul>
+          </div>
+        )}
+
+        {messages.map(m => (
+          <div key={m.id} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', backgroundColor: m.role === 'user' ? '#0070f3' : '#222', color: 'white', padding: '10px 14px', borderRadius: '8px', maxWidth: '80%' }}>
+            <strong>{m.role === 'user' ? 'You: ' : 'AI: '}</strong>{m.content}
+          </div>
+        ))}
+
+        {statusState === 'loading' && (
+          <div style={{ alignSelf: 'flex-start', width: '70%', background: '#222', padding: '15px', borderRadius: '8px', border: '1px solid #333' }}>
+            <div style={{ height: '14px', background: '#444', width: '40%', marginBottom: '10px', borderRadius: '4px' }} />
+            <div style={{ height: '12px', background: '#333', width: '90%', borderRadius: '4px' }} />
+          </div>
+        )}
+
+        {statusState === 'error' && (
+          <div style={{ padding: '15px', backgroundColor: '#2d0000', borderRadius: '6px', border: '1px solid #ff4444', marginTop: '10px' }}>
+            <b style={{ color: '#ff9999' }}>?? Mid-Stream Connection Terminated</b>
+            <p style={{ margin: '5px 0 12px', color: '#ccc', fontSize: '14px' }}>The prompt streaming connection context wrapper threw a premature gateway execution failure.</p>
+            <button type="button" onClick={() => triggerChatFlow(retryPrompt)} style={{ padding: '6px 14px', backgroundColor: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+              ?? Retry Generation
+            </button>
           </div>
         )}
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); if (textInput.trim()) { const p = textInput; setTextInput(''); triggerToolLifecycle(p); } }} style={{ display: 'flex', gap: '10px' }}>
-        <input 
-          value={textInput} 
-          onChange={(e) => setTextInput(e.target.value)} 
-          placeholder='Try: "Score lead John Doe" or "Trigger a tool error"' 
-          style={{ flex: 1, padding: '12px', background: '#111', color: 'white', border: '1px solid #444', borderRadius: '6px' }} 
-        />
-        <button type='submit' style={{ padding: '0 24px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-          Run Tool
-        </button>
+      <form onSubmit={(e) => { e.preventDefault(); if (textInput.trim() && (statusState === 'idle' || statusState === 'error')) { const p = textInput; setTextInput(''); triggerChatFlow(p); } }} style={{ display: 'flex', gap: '10px' }}>
+        <input value={textInput} onChange={(e) => setTextInput(e.target.value)} placeholder='Type here or click a starter state action link...' style={{ flex: 1, padding: '12px', background: '#111', color: 'white', border: '1px solid #444', borderRadius: '6px' }} />
+        <button type='submit' style={{ padding: '0 24px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Send</button>
       </form>
     </div>
   );
